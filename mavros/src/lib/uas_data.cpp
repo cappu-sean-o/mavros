@@ -52,10 +52,17 @@ UAS::UAS() :
 	}
 
 	// Publish helper TFs used for frame transformation in the odometry plugin
+	ros::NodeHandle ned_transforms("~");
+	std::string map_frame_id;
+	std::string odom_frame_id;
+	std::string frame_id;
+	ned_transforms.param<std::string>("map_frame_id", map_frame_id, "map");
+	ned_transforms.param<std::string>("odom_frame_id", odom_frame_id, "odom");
+	ned_transforms.param<std::string>("frame_id", frame_id, "base_link");
 	std::vector<geometry_msgs::TransformStamped> transform_vector;
-	add_static_transform("map", "map_ned", Eigen::Affine3d(ftf::quaternion_from_rpy(M_PI, 0, M_PI_2)),transform_vector);
-	add_static_transform("odom", "odom_ned", Eigen::Affine3d(ftf::quaternion_from_rpy(M_PI, 0, M_PI_2)),transform_vector);
-	add_static_transform("base_link", "base_link_frd", Eigen::Affine3d(ftf::quaternion_from_rpy(M_PI, 0, 0)),transform_vector);
+	add_static_transform(map_frame_id, "map_ned", Eigen::Affine3d(ftf::quaternion_from_rpy(M_PI, 0, M_PI_2)),transform_vector);
+	add_static_transform(odom_frame_id, "odom_ned", Eigen::Affine3d(ftf::quaternion_from_rpy(M_PI, 0, M_PI_2)),transform_vector);
+	add_static_transform(frame_id, "base_link_frd", Eigen::Affine3d(ftf::quaternion_from_rpy(M_PI, 0, 0)),transform_vector);
 
 	tf2_static_broadcaster.sendTransform(transform_vector);
 }
